@@ -1,0 +1,17 @@
+*.iml
+.gradle/
+.kotlin/
+/local.properties
+/.idea/
+.DS_Store
+/build/
+/app/build/
+/captures/
+.externalNativeBuild/
+.cxx/
+*.apk
+*.aab
+
+# copyrighted sounds kept local only
+app/src/main/assets/sounds/cant_hold_us_x_bad_piggies.mp3
+app/src/main/assets/sounds/morning_flower_trap.mp3

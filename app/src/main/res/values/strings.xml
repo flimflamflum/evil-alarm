@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Evil Alarm</string>
+    <string name="blocker_service_label">Evil Alarm app blocker</string>
+    <string name="blocker_service_description">Lets Evil Alarm see which app is open so it can block the ones you picked after your alarm rings. It only gets told when you switch apps and never reads what is on your screen.</string>
+</resources>
