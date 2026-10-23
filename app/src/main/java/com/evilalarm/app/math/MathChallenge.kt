@@ -9,8 +9,14 @@ object MathChallenge {
     /** Questions needed to turn off a ringing alarm. */
     const val DISMISS_QUESTIONS = 2
 
+    /** Questions needed to turn off a ringing alarm when you can't scan your code. */
+    const val DISMISS_SCAN_FALLBACK_QUESTIONS = 5
+
     /** Questions needed to end an app block early. */
     const val END_BLOCK_QUESTIONS = 5
+
+    /** Hard questions needed to end an app block early when you can't scan your blocker code. */
+    const val END_BLOCK_SCAN_FALLBACK_QUESTIONS = 10
 
     fun question(difficulty: Difficulty, random: Random = Random.Default): MathQuestion = when (difficulty) {
         Difficulty.EASY -> if (random.nextBoolean()) {

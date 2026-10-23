@@ -8,6 +8,7 @@ import com.evilalarm.app.alarm.AlarmScheduler
 import com.evilalarm.app.alarm.Bedtime
 import com.evilalarm.app.data.Alarm
 import com.evilalarm.app.data.AppSettings
+import com.evilalarm.app.data.BlockerUnlockMethod
 import com.evilalarm.app.data.DismissMethod
 import com.evilalarm.app.data.Stats
 import com.evilalarm.app.data.StatsSummary
@@ -65,6 +66,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun saveWakeUpCode(code: String) {
         updateSettings { it.copy(qrCode = code, dismissMethod = DismissMethod.QR) }
         toast("Code saved. Now you'll have to go scan it.")
+    }
+
+    /** Registers the code to scan to end a block early and switches to scanning. */
+    fun saveBlockerCode(code: String) {
+        updateSettings { it.copy(blockerCode = code, blockerUnlock = BlockerUnlockMethod.QR) }
+        toast("Code saved. Ending a block early now means going to scan it.")
     }
 
     val blockUntil: StateFlow<Long> =

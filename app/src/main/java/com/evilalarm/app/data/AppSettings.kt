@@ -15,6 +15,12 @@ enum class DismissMethod(val label: String) {
     SHAKE("Shake"),
 }
 
+/** What you have to do to end an app block early. */
+enum class BlockerUnlockMethod(val label: String) {
+    MATH("Math"),
+    QR("QR code"),
+}
+
 data class AppSettings(
     val soundId: String = SoundCatalog.EVIL_ALARM_ID,
     val difficulty: Difficulty = Difficulty.MEDIUM,
@@ -31,6 +37,14 @@ data class AppSettings(
     /** How long the first alarm of the day locks [blockedPackages]. */
     val blockMinutes: Int = 30,
     val blockedPackages: Set<String> = DEFAULT_BLOCKED_PACKAGES,
+    val blockerUnlock: BlockerUnlockMethod = BlockerUnlockMethod.MATH,
+    /** Difficulty of the problems that end a block early when [blockerUnlock] is [BlockerUnlockMethod.MATH]. */
+    val blockerDifficulty: Difficulty = Difficulty.HARD,
+    /**
+     * Contents of the code to scan when [blockerUnlock] is [BlockerUnlockMethod.QR]. Never the same
+     * as [qrCode], so one scan can't both stop the alarm and end the block.
+     */
+    val blockerCode: String? = null,
 ) {
     companion object {
         val DEFAULT_BLOCKED_PACKAGES = setOf(

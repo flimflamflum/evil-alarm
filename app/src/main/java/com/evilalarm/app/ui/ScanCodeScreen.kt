@@ -24,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.evilalarm.app.ui.theme.Glass
@@ -31,12 +32,22 @@ import com.evilalarm.app.ui.theme.GlassButton
 import com.evilalarm.app.ui.theme.GlassCard
 import com.evilalarm.app.ui.theme.ScreenHeader
 
-/** Registers the QR code or barcode you'll have to scan to turn the alarm off. */
+/**
+ * Registers a QR code or barcode you'll have to scan later. [rejectReason] says why a scanned code
+ * can't be used (null if it can), and scanning carries on until one passes.
+ */
 @Composable
-fun ScanCodeScreen(onScanned: (String) -> Unit, onBack: () -> Unit) {
+fun ScanCodeScreen(
+    title: String,
+    description: String,
+    rejectReason: (String) -> String?,
+    onScanned: (String) -> Unit,
+    onBack: () -> Unit,
+) {
     val (cameraAllowed, askForCamera) = rememberCameraPermission()
     var torchOn by remember { mutableStateOf(false) }
     var done by remember { mutableStateOf(false) }
+    var rejected by remember { mutableStateOf<String?>(null) }
 
     Column(
         Modifier
@@ -46,10 +57,9 @@ fun ScanCodeScreen(onScanned: (String) -> Unit, onBack: () -> Unit) {
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        ScreenHeader("Your wake-up code", onBack)
+        ScreenHeader(title, onBack)
         Text(
-            "Pick a QR code or barcode somewhere you have to walk to: a printed QR code on the bathroom mirror, " +
-                "or the barcode on your shampoo or a cereal box. To turn the alarm off, you'll have to go scan it.",
+            description,
             color = Glass.TextSecondary,
             fontSize = 14.sp,
         )
@@ -69,8 +79,11 @@ fun ScanCodeScreen(onScanned: (String) -> Unit, onBack: () -> Unit) {
                     CodeScanner(
                         onCode = { code ->
                             if (!done) {
-                                done = true
-                                onScanned(code)
+                                rejected = rejectReason(code)
+                                if (rejected == null) {
+                                    done = true
+                                    onScanned(code)
+                                }
                             }
                         },
                         torchOn = torchOn,
@@ -78,12 +91,21 @@ fun ScanCodeScreen(onScanned: (String) -> Unit, onBack: () -> Unit) {
                     )
                 } else {
                     Text(
-                        "Evil Alarm needs the camera to scan your code. It's only used on this screen and the alarm screen.",
+                        "Evil Alarm needs the camera to scan your code. It's only used on this screen, the alarm screen and the block screen.",
                         color = Glass.TextSecondary,
                         fontSize = 14.sp,
                         modifier = Modifier.padding(24.dp),
                     )
                 }
+            }
+            rejected?.let {
+                Text(
+                    it,
+                    color = Glass.Danger,
+                    fontSize = 14.sp,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(top = 12.dp),
+                )
             }
             if (cameraAllowed) {
                 Text(

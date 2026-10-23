@@ -129,7 +129,7 @@ fun SettingsScreen(
                             "Shake your phone ${ShakeChallenge.shakesFor(settings.difficulty)} times to turn the alarm off."
                         DismissMethod.QR ->
                             "Scan your code to turn the alarm off, so put it somewhere you have to walk to. " +
-                                "Can't scan it? Then it's ${MathChallenge.END_BLOCK_QUESTIONS} problems like  $example ."
+                                "Can't scan it? Then it's ${MathChallenge.DISMISS_SCAN_FALLBACK_QUESTIONS} problems like  $example ."
                     },
                     color = Glass.TextSecondary,
                     fontSize = 13.sp,

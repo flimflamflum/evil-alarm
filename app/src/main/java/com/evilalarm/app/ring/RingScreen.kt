@@ -103,11 +103,12 @@ private fun DismissChallenge(ringing: RingingAlarm, onSolved: () -> Unit) {
             fallback || (settings.dismissMethod == DismissMethod.QR && qrCode == null) -> MathPanel(
                 settings.difficulty,
                 // Bailing out of a scan costs more than plain math does.
-                if (fallback && settings.dismissMethod == DismissMethod.QR) MathChallenge.END_BLOCK_QUESTIONS else MathChallenge.DISMISS_QUESTIONS,
+                if (fallback && settings.dismissMethod == DismissMethod.QR) MathChallenge.DISMISS_SCAN_FALLBACK_QUESTIONS else MathChallenge.DISMISS_QUESTIONS,
                 onSolved,
             )
             settings.dismissMethod == DismissMethod.QR && qrCode != null -> ScanPanel(
                 expectedCode = qrCode,
+                fallbackQuestions = MathChallenge.DISMISS_SCAN_FALLBACK_QUESTIONS,
                 onSolved = onSolved,
                 onGiveUp = { fallback = true },
             )

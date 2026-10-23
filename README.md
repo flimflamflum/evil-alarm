@@ -24,7 +24,11 @@ and locks your distracting apps for the first half hour of your day.
 - The first alarm of the day starts the block the moment it rings. Snoozes and later alarms that day
   don't start another.
 - Block length is configurable. A full-screen block screen shows a countdown.
-- End a block early by solving 5 math problems.
+- End a block early by either:
+  - **Math:** solve 5 problems (Hard by default; Easy, Medium or Hard).
+  - **QR code / barcode:** scan a second code, separate from your alarm code (the app won't let you
+    reuse it). If the scan fails, you fall back to 10 Hard math problems.
+- How a block ends is locked while one is running.
 - Start a block manually, or use the 10-second test alarm to try the whole flow without using up the day.
 
 ### Staying awake

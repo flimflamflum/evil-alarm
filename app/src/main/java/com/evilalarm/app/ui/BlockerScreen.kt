@@ -1,5 +1,6 @@
 package com.evilalarm.app.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,6 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -31,6 +34,8 @@ import androidx.compose.ui.unit.sp
 import com.evilalarm.app.blocker.Blocker
 import com.evilalarm.app.blocker.rememberBlockerEnabled
 import com.evilalarm.app.data.AppSettings
+import com.evilalarm.app.data.BlockerUnlockMethod
+import com.evilalarm.app.data.Difficulty
 import com.evilalarm.app.math.MathChallenge
 import com.evilalarm.app.ui.theme.Glass
 import com.evilalarm.app.ui.theme.GlassButton
@@ -51,6 +56,7 @@ fun BlockerScreen(
     onStartBlock: () -> Unit,
     onEndBlock: () -> Unit,
     onPickApps: () -> Unit,
+    onScanCode: () -> Unit,
     onBack: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -104,7 +110,7 @@ fun BlockerScreen(
                 Spacer(Modifier.height(12.dp))
                 if (!solving) {
                     GlassButton(
-                        "End block early · solve ${MathChallenge.END_BLOCK_QUESTIONS}",
+                        endBlockLabel(settings),
                         onClick = { solving = true },
                         modifier = Modifier.fillMaxWidth(),
                     )
@@ -136,14 +142,87 @@ fun BlockerScreen(
         }
 
         if (active && solving) {
-            MathPanel(
-                settings.difficulty,
-                MathChallenge.END_BLOCK_QUESTIONS,
+            EndBlockChallenge(
+                settings,
                 onSolved = {
                     solving = false
                     onEndBlock()
                 },
             )
+        }
+
+        Column {
+            SectionTitle("End a block early by")
+            GlassCard(Modifier.fillMaxWidth()) {
+                // Changing how a block ends while one is running would be an easy way out of it.
+                if (!active) {
+                    GlassSegmented(
+                        options = BlockerUnlockMethod.entries,
+                        selected = settings.blockerUnlock,
+                        label = { it.label },
+                        onSelect = { method ->
+                            // Scanning needs a code first; registering one switches the method over.
+                            if (method == BlockerUnlockMethod.QR && settings.blockerCode == null) onScanCode()
+                            else onChange { it.copy(blockerUnlock = method) }
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    if (settings.blockerUnlock == BlockerUnlockMethod.MATH) {
+                        Spacer(Modifier.height(16.dp))
+                        Text(
+                            "DIFFICULTY",
+                            color = Glass.TextFaint,
+                            fontSize = 11.sp,
+                            letterSpacing = 1.5.sp,
+                            modifier = Modifier.padding(start = 4.dp, bottom = 6.dp),
+                        )
+                        GlassSegmented(
+                            options = Difficulty.entries,
+                            selected = settings.blockerDifficulty,
+                            label = { it.label },
+                            onSelect = { difficulty -> onChange { it.copy(blockerDifficulty = difficulty) } },
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
+                    Spacer(Modifier.height(12.dp))
+                }
+                val exampleDifficulty =
+                    if (settings.blockerUnlock == BlockerUnlockMethod.MATH) settings.blockerDifficulty else Difficulty.HARD
+                val example = remember(exampleDifficulty) { MathChallenge.question(exampleDifficulty).text }
+                Text(
+                    when (settings.blockerUnlock) {
+                        BlockerUnlockMethod.MATH ->
+                            "Solve ${MathChallenge.END_BLOCK_QUESTIONS} problems like  $example  to end a block early."
+                        BlockerUnlockMethod.QR ->
+                            "Scan your blocker code to end a block early. It has to be a different code from your alarm one, " +
+                                "so put it somewhere else out of the way. Can't scan it? Then it's " +
+                                "${MathChallenge.END_BLOCK_SCAN_FALLBACK_QUESTIONS} hard problems like  $example ."
+                    },
+                    color = Glass.TextSecondary,
+                    fontSize = 13.sp,
+                    modifier = Modifier.padding(horizontal = 4.dp),
+                )
+                if (active) {
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        "Locked until this block ends.",
+                        color = Glass.TextFaint,
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(horizontal = 4.dp),
+                    )
+                } else if (settings.blockerUnlock == BlockerUnlockMethod.QR) {
+                    Text(
+                        "Scan a new code",
+                        color = Glass.Pink,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 14.sp,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .clickable(onClick = onScanCode)
+                            .padding(horizontal = 4.dp, vertical = 10.dp),
+                    )
+                }
+            }
         }
 
         Column {

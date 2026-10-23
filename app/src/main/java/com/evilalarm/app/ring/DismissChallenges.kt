@@ -113,11 +113,11 @@ fun ShakePanel(target: Int, onSolved: () -> Unit, onUnavailable: () -> Unit) {
 }
 
 /**
- * Scan the code you registered in Settings. [onGiveUp] switches to the math fallback, for a broken
- * camera or a lost code.
+ * Scan the code you registered. [onGiveUp] switches to a fallback of [fallbackQuestions] math
+ * problems, for a broken camera or a lost code.
  */
 @Composable
-fun ScanPanel(expectedCode: String, onSolved: () -> Unit, onGiveUp: () -> Unit) {
+fun ScanPanel(expectedCode: String, fallbackQuestions: Int, onSolved: () -> Unit, onGiveUp: () -> Unit) {
     val (cameraAllowed, askForCamera) = rememberCameraPermission()
     var torchOn by remember { mutableStateOf(false) }
     var wrongCode by remember { mutableStateOf(false) }
@@ -180,7 +180,7 @@ fun ScanPanel(expectedCode: String, onSolved: () -> Unit, onGiveUp: () -> Unit) 
         }
     }
     Text(
-        "Can't scan it? Solve 5 math problems instead",
+        "Can't scan it? Solve $fallbackQuestions math problems instead",
         color = Glass.TextFaint,
         fontSize = 14.sp,
         textAlign = TextAlign.Center,

@@ -45,6 +45,7 @@ private sealed interface Screen {
     data object Setup : Screen
     data object Stats : Screen
     data object ScanCode : Screen
+    data object ScanBlockerCode : Screen
 }
 
 @Composable
@@ -60,7 +61,7 @@ private fun EvilAlarmNav(vm: MainViewModel = viewModel()) {
     var ready by remember { mutableStateOf(false) }
     val goBack = {
         screen = when (screen) {
-            Screen.BlockedApps -> Screen.Blocker
+            Screen.BlockedApps, Screen.ScanBlockerCode -> Screen.Blocker
             Screen.ScanCode -> Screen.Settings
             else -> Screen.Alarms
         }
@@ -108,6 +109,7 @@ private fun EvilAlarmNav(vm: MainViewModel = viewModel()) {
                     onStartBlock = vm::startBlockNow,
                     onEndBlock = vm::endBlock,
                     onPickApps = { screen = Screen.BlockedApps },
+                    onScanCode = { screen = Screen.ScanBlockerCode },
                     onBack = goBack,
                 )
                 Screen.BlockedApps -> BlockedAppsScreen(
@@ -136,9 +138,28 @@ private fun EvilAlarmNav(vm: MainViewModel = viewModel()) {
                     onBack = goBack,
                 )
                 Screen.ScanCode -> ScanCodeScreen(
+                    title = "Your wake-up code",
+                    description = "Pick a QR code or barcode somewhere you have to walk to: a printed QR code on the bathroom mirror, " +
+                        "or the barcode on your shampoo or a cereal box. To turn the alarm off, you'll have to go scan it.",
+                    rejectReason = { code ->
+                        if (code == settings.blockerCode) "That's your app blocker code. Pick a different one." else null
+                    },
                     onScanned = {
                         vm.saveWakeUpCode(it)
                         screen = Screen.Settings
+                    },
+                    onBack = goBack,
+                )
+                Screen.ScanBlockerCode -> ScanCodeScreen(
+                    title = "Your blocker code",
+                    description = "Pick a second QR code or barcode, different from your wake-up code, and somewhere out of the way: " +
+                        "the back of a cupboard, the garage, a friend's fridge. To end a block early, you'll have to go scan it.",
+                    rejectReason = { code ->
+                        if (code == settings.qrCode) "That's your wake-up code. Pick a different one." else null
+                    },
+                    onScanned = {
+                        vm.saveBlockerCode(it)
+                        screen = Screen.Blocker
                     },
                     onBack = goBack,
                 )

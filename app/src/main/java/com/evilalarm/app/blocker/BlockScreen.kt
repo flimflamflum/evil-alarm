@@ -24,10 +24,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.evilalarm.app.data.Difficulty
-import com.evilalarm.app.math.MathChallenge
-import com.evilalarm.app.ui.MathPanel
+import com.evilalarm.app.data.AppSettings
+import com.evilalarm.app.ui.EndBlockChallenge
 import com.evilalarm.app.ui.currentTimeMillis
+import com.evilalarm.app.ui.endBlockLabel
 import com.evilalarm.app.ui.formatCountdown
 import com.evilalarm.app.ui.theme.Glass
 import com.evilalarm.app.ui.theme.GlassBackground
@@ -38,7 +38,7 @@ fun BlockScreen(
     appLabel: String,
     blockUntil: Long,
     attemptsToday: Int,
-    difficulty: Difficulty,
+    settings: AppSettings,
     onGoHome: () -> Unit,
     onEndBlock: () -> Unit,
     onContinue: () -> Unit,
@@ -82,14 +82,14 @@ fun BlockScreen(
 
                 if (solving) {
                     Spacer(Modifier.height(24.dp))
-                    MathPanel(difficulty, MathChallenge.END_BLOCK_QUESTIONS, onSolved = onEndBlock)
+                    EndBlockChallenge(settings, onSolved = onEndBlock)
                     Spacer(Modifier.height(12.dp))
                     QuietButton("Never mind") { solving = false }
                 } else {
                     Spacer(Modifier.height(56.dp))
                     GlassButton("Go home", onClick = onGoHome, accent = true, modifier = Modifier.fillMaxWidth())
                     Spacer(Modifier.height(12.dp))
-                    QuietButton("End block early · solve ${MathChallenge.END_BLOCK_QUESTIONS}") { solving = true }
+                    QuietButton(endBlockLabel(settings)) { solving = true }
                 }
             }
         }

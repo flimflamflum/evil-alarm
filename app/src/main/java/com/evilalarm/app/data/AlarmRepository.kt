@@ -66,6 +66,9 @@ class AlarmRepository(context: Context) {
             prefs[HARD_MODE] = next.hardMode
             prefs[BLOCK_MINUTES] = next.blockMinutes
             prefs[BLOCKED_PACKAGES] = next.blockedPackages
+            prefs[BLOCKER_UNLOCK] = next.blockerUnlock.name
+            prefs[BLOCKER_DIFFICULTY] = next.blockerDifficulty.name
+            if (next.blockerCode == null) prefs.remove(BLOCKER_CODE) else prefs[BLOCKER_CODE] = next.blockerCode
         }
     }
 
@@ -167,6 +170,11 @@ class AlarmRepository(context: Context) {
             hardMode = prefs[HARD_MODE] ?: defaults.hardMode,
             blockMinutes = prefs[BLOCK_MINUTES] ?: defaults.blockMinutes,
             blockedPackages = prefs[BLOCKED_PACKAGES] ?: defaults.blockedPackages,
+            blockerUnlock = prefs[BLOCKER_UNLOCK]?.let { name -> BlockerUnlockMethod.entries.find { it.name == name } }
+                ?: defaults.blockerUnlock,
+            blockerDifficulty = prefs[BLOCKER_DIFFICULTY]?.let { name -> Difficulty.entries.find { it.name == name } }
+                ?: defaults.blockerDifficulty,
+            blockerCode = prefs[BLOCKER_CODE],
         )
     }
 
@@ -186,5 +194,8 @@ class AlarmRepository(context: Context) {
         val WAKE_CHECK = booleanPreferencesKey("wake_check")
         val BEDTIME_HOURS = intPreferencesKey("bedtime_hours")
         val DAY_STATS = stringPreferencesKey("day_stats")
+        val BLOCKER_UNLOCK = stringPreferencesKey("blocker_unlock")
+        val BLOCKER_DIFFICULTY = stringPreferencesKey("blocker_difficulty")
+        val BLOCKER_CODE = stringPreferencesKey("blocker_code")
     }
 }

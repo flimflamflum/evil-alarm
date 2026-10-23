@@ -45,7 +45,7 @@ class BlockActivity : ComponentActivity() {
                         appLabel = blockedLabel,
                         blockUntil = until,
                         attemptsToday = attemptsToday,
-                        difficulty = settings.difficulty,
+                        settings = settings,
                         onGoHome = ::goHome,
                         onEndBlock = {
                             scope.launch {
